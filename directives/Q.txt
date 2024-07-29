@@ -1,0 +1,111 @@
+1.What is a structural directive? Can you give an example?
+Answer: Structural directives change the DOM layout by adding and removing DOM elements. 
+Examples include *ngIf, *ngFor, and *ngSwitch.
+---------------------------------------------------------------
+
+What is the difference between a component and a directive in Angular?
+Answer: Components are directives with a template.
+While all components are directives, not all directives are components. 
+Components are used to create reusable UI elements, whereas directives are used to add behavior to existing DOM elements.
+
+---------------------------------------------------------------
+
+Explain the purpose of the @HostListener decorator in Angular.
+Answer: The @HostListener decorator is used to listen to events on the host element of the directive.
+ It allows you to handle events such as mouse clicks, hovers, and others directly within the directive.
+---------------------------------------------------------------
+
+How does Angular differentiate between attribute and structural directives?
+Answer: Angular differentiates between attribute and structural directives based on their syntax. 
+Structural directives use the * prefix (e.g., *ngIf), whereas attribute directives do not (e.g., [ngClass]).
+---------------------------------------------------------------
+
+What is the difference between @HostBinding and @HostListener?
+
+Answer:
+@HostBinding is used to bind a property of the host element to a property in the directive.
+For example:
+@HostBinding('class.active') isActive = true;
+
+@HostListener is used to listen to events on the host element and execute a method when the event occurs. For example:
+@HostListener('click') onClick() {
+  console.log('Element clicked');
+}
+---------------------------------------------------------------
+Can you explain the use of the Renderer2 service in Angular directives?
+
+Answer: Renderer2 is a service that provides an abstraction for DOM manipulation, making it easier to perform operations in a way that is compatible with Angular's rendering engine. 
+It helps in ensuring that the code works in different environments such as server-side rendering.
+ Example:
+ constructor(private el: ElementRef, private renderer: Renderer2) {
+  this.renderer.setStyle(this.el.nativeElement, 'color', 'red');
+}
+---------------------------------------------------------------
+
+How do you pass parameters to a directive in Angular?
+Answer: You can pass parameters to a directive using the @Input decorator.
+For example:
+
+@Directive({
+  selector: '[appHighlight]'
+})
+export class HighlightDirective {
+  @Input() appHighlight: string;
+
+  constructor(private el: ElementRef, private renderer: Renderer2) { }
+
+  ngOnInit() {
+    this.renderer.setStyle(this.el.nativeElement, 'backgroundColor', this.appHighlight);
+  }
+}
+
+Usage in template:
+<div [appHighlight]="'yellow'">Highlighted Text</div>
+---------------------------------------------------------------
+
+What are the differences between structural and attribute directives in terms of functionality and use cases?
+Answer: Structural directives change the DOM layout by adding or removing elements (e.g., *ngIf, *ngFor). 
+Attribute directives change the appearance or behavior of an existing element (e.g., [ngClass], [ngStyle]). 
+Structural directives are used for conditional rendering and looping, while attribute directives are used for applying styles or classes dynamically.
+---------------------------------------------------------------
+
+What is the purpose of the ng-template directive in Angular?
+Answer: The ng-template directive is used to define template content that is not rendered by default. 
+It is often used with structural directives to conditionally render parts of the DOM. 
+It provides a way to encapsulate template code that Angular can dynamically insert or remove from the DOM.
+---------------------------------------------------------------
+
+How do you create a shared directive that can be used across multiple modules?
+
+Answer: To create a shared directive, define the directive in a shared module and export it. 
+Then, import this shared module into other modules where you want to use the directive.
+Example:
+@NgModule({
+  declarations: [HighlightDirective],
+  exports: [HighlightDirective]
+})
+export class SharedModule { }
+
+@NgModule({
+  imports: [SharedModule]
+})
+export class SomeFeatureModule { }
+---------------------------------------------------------------
+
+Can a directive modify the behavior of its host component? If yes, how?
+Answer: Yes, a directive can modify the behavior of its host component by interacting with the component's properties and methods using the @Host or @Self decorators.
+Example:
+
+@Directive({
+  selector: '[appModifyHost]'
+})
+export class ModifyHostDirective {
+  constructor(@Host() private hostComponent: HostComponent) {
+    this.hostComponent.someProperty = 'Modified by directive';
+  }
+}
+---------------------------------------------------------------
+
+
+
+

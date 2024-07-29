@@ -1,0 +1,173 @@
+What are pure Pipes?
+
+Pure Pipes
+Definition:
+Pure pipes are stateless and rely solely on their input values for the output. They do not maintain any internal state and always produce the same output for the same input. Pure pipes are only executed when Angular detects a pure change to the input value. A pure change is either a change to a primitive input value or a change to an object reference.
+
+Behavior:
+Angular checks pure pipes only when the input value changes.
+They do not re-evaluate when changes occur within objects or arrays unless the reference itself changes.
+They are efficient and suitable for transformations that are independent of any side-effects or state.
+
+Default Behavior:
+By default, all pipes in Angular are pure unless specified otherwise.
+
+Example:
+
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({
+  name: 'capitalize'
+})
+export class CapitalizePipe implements PipeTransform {
+  transform(value: string): string {
+    return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+  }
+}
+
+Usage in Template:
+
+<p>{{ 'hello world' | capitalize }}</p>
+
+In this example, the CapitalizePipe is a pure pipe that capitalizes the first letter of a string. 
+It will only be re-evaluated when the input string changes.
+------------------------------------------------------------------------------------------------------------------------------
+What are impure pipes?
+
+Impure Pipes
+Definition:
+Impure pipes, on the other hand, can be stateful and are re-evaluated every time a change detection cycle runs, regardless of whether the input value has changed.
+
+Behavior:
+Angular checks impure pipes every time change detection runs.
+They can handle changes within objects or arrays and are useful for cases where the transformation depends on mutable data.
+They can be less efficient compared to pure pipes due to frequent re-evaluations.
+
+Marking a Pipe as Impure:
+To create an impure pipe, you set the pure flag to false in the pipe's metadata.
+
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({
+  name: 'filterArray',
+  pure: false
+})
+export class FilterArrayPipe implements PipeTransform {
+  transform(items: any[], searchText: string): any[] {
+    if (!items || !searchText) {
+      return items;
+    }
+    return items.filter(item => item.name.includes(searchText));
+  }
+}
+
+Usage in Template:
+<ul>
+  <li *ngFor="let item of items | filterArray: searchText">{{ item.name }}</li>
+</ul>
+
+---------------------------------------------------------------------------------------------------------------------------
+
+how more than one arguments are passed to a pipe?
+
+In Angular, you can pass more than one argument to a pipe by separating the arguments with colons (:) in the template.
+The first part before the colon is the input value, and the subsequent parts are the additional arguments.
+
+Here's an example of how to create a custom pipe that accepts multiple arguments:
+
+Creating a Custom Pipe with Multiple Arguments
+Define the Pipe:
+First, create a custom pipe that can accept multiple arguments.
+
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({
+  name: 'multiArg'
+})
+export class MultiArgPipe implements PipeTransform {
+  transform(value: string, arg1: string, arg2: string): string {
+    return `${value} - ${arg1} - ${arg2}`;
+  }
+}
+
+In this example, the MultiArgPipe takes three arguments: value, arg1, and arg2, and concatenates them with hyphens.
+
+Use the Pipe in a Template:
+You can use the pipe in a template by passing the arguments after the input value, separated by colons.
+
+<p>{{ 'Hello' | multiArg:'World':'!' }}</p>
+
+---------------------------------------------------------------------------------------------------------------------------
+
+What is Pipe transform Interface in Angular?
+
+The PipeTransform interface in Angular is a key part of the pipe infrastructure. It defines the transform method, which you must implement when creating a custom pipe. 
+This method contains the logic to transform the input value to a desired output value.
+
+PipeTransform Interface
+The PipeTransform interface ensures that your custom pipe class implements a transform method, which Angular calls whenever the pipe is used in a template. 
+The method signature for PipeTransform is as follows:
+
+interface PipeTransform {
+  transform(value: any, ...args: any[]): any;
+}
+
+Implementing PipeTransform
+When you create a custom pipe, you need to implement the PipeTransform interface in your pipe class. Here’s the basic structure:
+
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({
+  name: 'myCustomPipe'
+})
+export class MyCustomPipe implements PipeTransform {
+  transform(value: any, ...args: any[]): any {
+    // Transformation logic here
+  }
+}
+
+---------------------------------------------------------------------------------------------------------------------------
+What is async pipe?
+The async pipe in Angular is a built-in pipe that allows you to handle Promises and Observables directly in your templates. 
+It automatically subscribes to the Observable or Promise and returns the latest value. 
+When the component gets destroyed, the async pipe unsubscribes to prevent memory leaks.
+
+Example:
+import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { UserService } from './user.service';
+
+@Component({
+  selector: 'app-user-list',
+  templateUrl: './user-list.component.html',
+})
+export class UserListComponent implements OnInit {
+  users$: Observable<any[]>;
+
+  constructor(private userService: UserService) {}
+
+  ngOnInit(): void {
+    this.users$ = this.userService.getUsers();
+  }
+}
+
+Use the async Pipe in the Template
+<!-- user-list.component.html -->
+<div>
+  <h1>User List</h1>
+  <ul>
+    <li *ngFor="let user of users$ | async">
+      {{ user.name }} ({{ user.email }})
+    </li>
+  </ul>
+</div>
+---------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+

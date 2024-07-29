@@ -1,0 +1,105 @@
+Constructor
+Purpose: Initialize class members and inject dependencies.
+ The constructor is called before any lifecycle hooks, including ngOnInit().
+---------------------------------------------------------------
+ngOnChanges
+Purpose: Respond to changes in @Input properties.
+
+Example:
+
+ngOnChanges(changes: SimpleChanges) {
+  console.log('ngOnChanges - user data changes:', changes);
+}
+This hook is called whenever the user input property changes, allowing you to act on those changes.
+NOTE:
+If your component has no inputs or you use it without providing any inputs, the framework will not call ngOnChanges().
+---------------------------------------------------------------
+
+ngOnInit
+Purpose: Perform component initialization.
+
+Example:
+ngOnInit() {
+  console.log('ngOnInit - initializing user data');
+  // Simulate fetching data from an API
+  this.user = { name: 'John Doe', bio: 'Software Developer' };
+}
+Use this hook to initialize data, typically fetching it from a service.
+NOTE:
+ngOnInit() is still called even when ngOnChanges() is not (which is the case when there are no template-bound inputs).
+---------------------------------------------------------------
+
+ngDoCheck
+Purpose: Custom change detection.
+
+Example: 
+ngDoCheck() {
+  console.log('ngDoCheck - checking user data');
+}
+Use this hook if you need to implement custom change detection logic. It's called with every change detection cycle.
+---------------------------------------------------------------
+
+ngAfterContentInit
+Purpose: Respond after Angular projects external content into the component's view.
+
+Example: 
+ngAfterContentInit() {
+  console.log('ngAfterContentInit - content initialized');
+}
+Use this hook to initialize any logic that depends on projected content.
+Called once after the first ngDoCheck().
+---------------------------------------------------------------
+
+ngAfterContentChecked
+Purpose: Respond after Angular checks the projected content.
+
+Example: 
+ngAfterContentChecked() {
+  console.log('ngAfterContentChecked - content checked');
+}
+Use this hook to perform actions after the content has been checked.
+Called after ngAfterContentInit() and every subsequent ngDoCheck().
+---------------------------------------------------------------
+
+ngAfterViewInit
+Purpose: Respond after Angular initializes the component's view.
+
+Example: 
+ngAfterViewInit() {
+  console.log('ngAfterViewInit - view initialized');
+  console.log('User info content:', this.userInfo.nativeElement.textContent);
+}
+This is a good place to perform logic that needs to run after the view is fully initialized.
+Called once after the first ngAfterContentChecked().
+---------------------------------------------------------------
+
+ngAfterViewChecked
+Purpose: Respond after Angular checks the component's view.
+
+Example: 
+ngAfterViewChecked() {
+  console.log('ngAfterViewChecked - view checked');
+}
+Use this hook to act on changes after the view has been checked.
+---------------------------------------------------------------
+
+ngOnDestroy
+Purpose: Cleanup before Angular destroys the component.
+
+Example: 
+ngOnDestroy() {
+  console.log('ngOnDestroy - cleanup before destroying');
+}
+This is the place to perform cleanup, such as unsubscribing from observables or detaching event handlers.
+---------------------------------------------------------------
+
+
+ Execution Order
+ngOnChanges()
+ngOnInit()
+ngDoCheck()
+ngAfterContentInit()
+ngAfterContentChecked()
+ngAfterViewInit()
+ngAfterViewChecked()
+ngOnDestroy()

@@ -1,0 +1,62 @@
+The tap operator in RxJS is used to perform side effects, which are actions that don't alter the data stream but might interact with external systems or log information. To make it clear, let's walk through a real-world example.
+
+Scenario: Fetching User Data and Logging
+Imagine you have an application where you fetch user data from an API. While processing this data, you want to log the data to the console for debugging purposes without modifying the data itself.
+
+Here's how you can do this using the tap operator:
+
+Without tap (less clean approach)
+You might be tempted to log the data inside a map or mergeMap, but this makes those functions impure because they now have side effects.
+
+import { of } from 'rxjs';
+import { map } from 'rxjs/operators';
+
+const fetchData = () => of({ id: 1, name: 'John Doe' });
+
+fetchData().pipe(
+  map(data => {
+    console.log(data); // Logging inside map (not recommended)
+    return data;
+  })
+).subscribe();
+
+With tap (clean approach)
+Using tap, you can log the data without affecting the purity of your other operators.
+
+import { of } from 'rxjs';
+import { tap, map } from 'rxjs/operators';
+
+const fetchData = () => of({ id: 1, name: 'John Doe' });
+
+fetchData().pipe(
+  tap(data => console.log(data)), // Logging with tap
+  map(data => data.name) // Pure transformation
+).subscribe();
+
+Conditional Side Effects
+
+The `tap` operator is also handy when you need to perform side effects conditionally. 
+For instance, you might want to show a loading spinner while waiting for data:
+
+import { tap } from 'rxjs/operators';
+
+let isLoading = true;
+
+observable$.pipe(
+  tap(() => {
+    // Show loading spinner
+    isLoading = true;
+  }),
+  finalize(() => {
+    // Hide loading spinner when the observable completes
+    isLoading = false;
+  })
+);
+
+
+Summary
+tap: Use for side effects like logging or debugging without altering the data stream.
+Purity: Keeps map and other transformation functions pure.
+Error Handling: Synchronous errors in tap are propagated down the observable stream.
+This separation of side effects (tap) and transformations (map, mergeMap, etc.) leads to cleaner and more maintainable code. 
+ 

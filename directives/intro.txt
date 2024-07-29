@@ -1,0 +1,42 @@
+Angular Directives are special tokens in the DOM that tell Angular to do something to a DOM element (e.g., change its appearance, behavior, or layout). 
+They are one of the core features of Angular.
+
+There are three types of directives in Angular:
+
+Component Directives: These directives have a template and are the most common type. 
+They are used to create reusable components.
+
+Structural Directives: These directives change the DOM layout by adding and removing DOM elements. 
+Examples include *ngIf, *ngFor, and *ngSwitch.
+
+Attribute Directives: These directives change the appearance or behavior of an element, component, or another directive. 
+Examples include ngClass, ngStyle, and custom attribute directives.
+
+---------------------------------------------------------------
+ 
+Creating a Custom Directive
+To create a custom attribute directive, you need to use the @Directive decorator:
+
+import { Directive, ElementRef, Renderer2, HostListener } from '@angular/core';
+
+@Directive({
+  selector: '[appHighlight]'
+})
+export class HighlightDirective {
+
+  constructor(private el: ElementRef, private renderer: Renderer2) { }
+
+  @HostListener('mouseenter') onMouseEnter() {
+    this.highlight('yellow');
+  }
+
+  @HostListener('mouseleave') onMouseLeave() {
+    this.highlight(null);
+  }
+
+  private highlight(color: string) {
+    this.renderer.setStyle(this.el.nativeElement, 'backgroundColor', color);
+  }
+}
+
+---------------------------------------------------------------

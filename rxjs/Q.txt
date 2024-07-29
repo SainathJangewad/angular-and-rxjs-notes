@@ -1,0 +1,215 @@
+1.What is the difference between an observable and a Promise?
+
+Promise:
+
+A promise has a single callback at the end of completion or failure.
+A promise is not Lazy. It cannot be cancelled.
+Observable:
+
+An observable emits multiple values over time.
+You may cancel an obeservable with an Unsubscribe() method.
+An observable only executes once subscribed to it.
+Provides efficient operators: map, reduce, foreach, filter, reduce, retry, retryWhen.
+--------------------------------------------------------------------------------------------
+
+What are RxJS Operators ?
+These are methods that can be applied to the observable in order to modify the data stream.
+--------------------------------------------------------------------------------------------
+
+What is Observers and Subscriptions ?
+Observers: They are the listeners/ consumers of the data stream; Observers listen /subscribe to the data stream.
+Subscribers: - Objects returned when an observable is subscribed; Useful in canceling the subscription.
+--------------------------------------------------------------------------------------------
+
+In RxJS, a Subject is a special type of observable that allows you to multicast values to multiple observers. 
+Unlike a regular observable, which only emits values to its subscribers, a Subject can be both an observable and an observer.
+This means it can emit values to its subscribers and also receive new values from other sources.
+
+Here are some key characteristics of a Subject:
+
+Multicasting: A Subject can broadcast values to multiple subscribers.
+When you subscribe to a Subject, you receive the values emitted by the Subject, and all subscribers receive the same values at the same time.
+
+Both Observable and Observer: A Subject can act as an observable (you can subscribe to it) and as an observer (you can call next(), error(), and complete() on it).
+This makes it possible to push new values into the Subject which will then be emitted to all its subscribers.
+
+State Management: Subject does not hold any value internally. Each subscriber receives values from the point in time they subscribe onwards.
+If you need a Subject that remembers the latest value and emits it to new subscribers, you can use BehaviorSubject instead.
+
+No Initial Value: A Subject does not provide any initial value when it's created. 
+For an initial value, you would use BehaviorSubject, which requires an initial value.
+
+import { Subject } from 'rxjs';
+
+// Create a new Subject
+const subject = new Subject();
+
+// Subscribe to the Subject
+subject.subscribe({
+  next: (value) => console.log(`Observer 1: ${value}`)
+});
+
+// Emit values to the Subject
+subject.next('Hello');
+subject.next('World');
+
+// Another subscriber
+subject.subscribe({
+  next: (value) => console.log(`Observer 2: ${value}`)
+});
+
+// Emit another value
+subject.next('!');
+
+--------------------------------------------------------------------------------------------
+
+What are different types of Subject ? 
+RxJS provides several types of Subject, each with its own behavior and use cases.
+Here’s a summary of the main types:
+
+Subject
+BehaviorSubject
+ReplaySubject
+AsyncSubject
+
+1.Subject
+Behavior: A Subject is a multicast observable that can emit new values to its subscribers.
+It does not store any values, so subscribers only receive values that are emitted after they subscribe.
+import { Subject } from 'rxjs';
+
+const subject = new Subject();
+
+// First subscriber
+subject.subscribe({
+  next: (value) => console.log(`Subscriber 1: ${value}`)
+});
+
+// Emit values
+subject.next('A');
+subject.next('B');
+
+// Second subscriber
+subject.subscribe({
+  next: (value) => console.log(`Subscriber 2: ${value}`)
+});
+
+// Emit more values
+subject.next('C');
+
+Output:
+Subscriber 1: A
+Subscriber 1: B
+Subscriber 2: C
+....................................................
+
+Example:
+
+BehaviorSubject
+Behavior: A BehaviorSubject requires an initial value and always emits the latest value to new subscribers. 
+It remembers the last emitted value and provides it to any new subscribers immediately upon subscription.
+
+import { BehaviorSubject } from 'rxjs';
+
+const behaviorSubject = new BehaviorSubject('Initial Value');
+
+// First subscriber
+behaviorSubject.subscribe({
+  next: (value) => console.log(`Subscriber 1: ${value}`)
+});
+
+// Emit values
+behaviorSubject.next('A');
+behaviorSubject.next('B');
+
+// Second subscriber
+behaviorSubject.subscribe({
+  next: (value) => console.log(`Subscriber 2: ${value}`)
+});
+
+// Emit more values
+behaviorSubject.next('C');
+
+Output:
+Subscriber 1: Initial Value
+Subscriber 1: A
+Subscriber 1: B
+Subscriber 2: B
+Subscriber 2: C
+
+....................................................
+ReplaySubject
+Behavior: A ReplaySubject can be configured to replay a specified number of past values to new subscribers. 
+It can also be set to replay values for a specified time period.
+
+import { ReplaySubject } from 'rxjs';
+
+const replaySubject = new ReplaySubject(2); // Buffer size of 2
+
+// First subscriber
+replaySubject.subscribe({
+  next: (value) => console.log(`Subscriber 1: ${value}`)
+});
+
+// Emit values
+replaySubject.next('A');
+replaySubject.next('B');
+replaySubject.next('C');
+
+// Second subscriber
+replaySubject.subscribe({
+  next: (value) => console.log(`Subscriber 2: ${value}`)
+});
+
+Output :
+Subscriber 1: A
+Subscriber 1: B
+Subscriber 1: C
+Subscriber 2: B
+Subscriber 2: C
+...................................................
+
+AsyncSubject
+Behavior: An AsyncSubject only emits the last value to its subscribers when the observable completes. 
+If the observable does not complete, subscribers will not receive any values.
+
+Example:
+import { AsyncSubject } from 'rxjs';
+
+const asyncSubject = new AsyncSubject();
+
+// First subscriber
+asyncSubject.subscribe({
+  next: (value) => console.log(`Subscriber 1: ${value}`)
+});
+
+// Emit values
+asyncSubject.next('A');
+asyncSubject.next('B');
+
+// Complete the observable
+asyncSubject.complete();
+
+// Second subscriber
+asyncSubject.subscribe({
+  next: (value) => console.log(`Subscriber 2: ${value}`)
+});
+
+Output :
+Subscriber 1: B
+Subscriber 2: B
+
+In this example, only the last value 'B' is emitted to subscribers after the AsyncSubject completes.
+-----------------------------------------------------------------------------------------------------
+
+In RxJS, a Scheduler is a tool that controls when and how tasks are executed, including when observables are subscribed to, when values are emitted, and when operators are applied. 
+
+Types of schedulers: queueScheduler, asapScheduler, asyncScheduler, animationFrameScheduler
+-----------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+

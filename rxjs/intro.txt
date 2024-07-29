@@ -1,0 +1,18 @@
+RxJS (Reactive Extensions for JavaScript) is a library for composing asynchronous and event-based programs using observable sequences and operators. 
+It helps manage asynchronous data streams and events in a functional and declarative manner.
+
+
+Key Concepts in RxJS
+Observable: Represents a stream of data that can be observed. Observables can emit values over time and can be created from various sources like arrays, events, or promises.
+
+Observer: An object that defines how to react to the values emitted by an Observable. It has methods like next, error, and complete.
+
+Subscription: Represents the execution of an Observable. By subscribing to an Observable, you start receiving notifications about the data it emits.
+
+Operators: Functions that allow you to manipulate and transform data emitted by Observables. Operators are categorized into creation operators (e.g., of, from), transformation operators (e.g., map, filter), and more.
+
+Subject: A special type of Observable that allows values to be multicasted to many Observers. Subjects can act as both an Observer and an Observable.
+
+Schedulers: Control the execution context of Observables. They determine when and how the Observable will emit values.
+
+

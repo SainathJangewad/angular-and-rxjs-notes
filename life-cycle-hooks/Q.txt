@@ -1,0 +1,21 @@
+1. What is the difference between ngOnInit() and constructor() in Angular?
+The Constructor is a default method of the class that is executed when the class is instantiated and ensures proper initialisation of fields in the class and its subclasses. Angular, or better Dependency Injector (DI), analyses the constructor parameters and when it creates a new instance by calling new MyClass() it tries to find providers that match the types of the constructor parameters, resolves them and passes them to the constructor like
+
+new MyClass(someArg);
+ngOnInit is a life cycle hook called by Angular to indicate that Angular is done creating the component.
+
+We have to import OnInit like this in order to use it (actually implementing OnInit is not mandatory but considered good practice):
+
+Context:
+Constructor: Does not have access to component input properties as they are not yet initialized.
+
+Timing:
+
+Constructor: Called immediately when a component instance is created, before Angular performs any initialization on the component.
+ngOnInit: Called after Angular has completed the initial data binding for the component.
+Purpose:
+
+Constructor: Used for dependency injection and initializing simple properties.
+ngOnInit: Used for more complex initialization that requires the component’s input properties to be set.
+
+---------------------------------------------------------------

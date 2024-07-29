@@ -1,0 +1,738 @@
+How does an Angular application work?
+Answer:
+Every Angular app consists of a file named angular.json.
+This file will contain all the configurations of the app. 
+While building the app, the builder looks at this file to find the entry point of the application. 
+Following is the code  of the angular.json file:
+
+"build": {
+        "builder": "@angular-devkit/build-angular:browser",
+        "options": {
+          "outputPath": "dist/angular-starter",
+          "index": "src/index.html",
+          "main": "src/main.ts",
+          "polyfills": "src/polyfills.ts",
+          "tsConfig": "tsconfig.app.json",
+          "aot": false,
+          "assets": [
+            "src/favicon.ico",
+            "src/assets"
+          ],
+          "styles": [
+            "./node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css",
+            "src/style.css"
+          ]
+        }
+      }
+
+Inside the build section, the main property of the options object defines the entry point of the application which in this case is main.ts.
+
+The main.ts file creates a browser environment for the application to run, and, along with this, it also calls a function called bootstrapModule, which bootstraps the application.
+These two steps are performed in the following order inside the main.ts file: 
+main.ts looks like this :
+
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { AppModule } from './app/app.module';
+
+platformBrowserDynamic().bootstrapModule(AppModule)
+  .catch(err => console.error(err));
+
+In the above line of code, AppModule is getting bootstrapped.
+
+The AppModule is declared in the app.module.ts file. This module contains declarations of all the components.
+
+Below is an example of app.module.ts file:  
+
+ import { BrowserModule } from '@angular/platform-browser';
+      import { NgModule } from '@angular/core';
+      import { AppComponent } from './app.component';
+
+      @NgModule({
+        declarations: [
+          AppComponent
+        ],
+        imports: [
+          BrowserModule
+        ],
+        providers: [],
+        entryComponents: [],
+        bootstrap: [AppComponent]
+      })
+      export class AppModule { }
+
+As one can see in the above file, AppComponent is getting bootstrapped.
+
+The root component (AppComponent) defined in the AppModule is bootstrapped. This component is the entry point of the Angular application and its template is rendered. 
+The template can include other components, creating a component hierarchy.
+
+After this, Angular calls the index.html file. This file consequently calls the root component that is app-root.
+The root component is defined in app.component.ts. This is how the index.html file looks:
+<!doctype html>
+      <html lang="en">
+      <head>
+        <meta charset="utf-8">
+        <title>Angular</title>
+        <base href="/">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+      </head>
+      <body>
+        <app-root></app-root>
+      </body>
+      </html>
+
+The HTML template of the root component is displayed inside the <app-root> tags.
+This is how every angular application works.
+-------------------------------------------------------------------------------------------------------------------------
+
+Advantages and disadvantage of angular ?
+
+Advantages:
+
+Features that are provided out of the box - Angular provides a number of built-in features like routing, state management, rxjs library and http servicesstraight out of the box. 
+This means that one does not need to look for the above-stated features separately. 
+They are all provided with angular.
+
+Two-Way Data Binding:
+Angular synchronizes data between the model and the view, which simplifies development and ensures data consistency.
+
+Component-Based Architecture:
+It promotes better code organization, reusability, and maintainability through its modular component-based structure.
+
+Strong Community Support:
+Supported by Google, Angular has a robust community, extensive documentation, and a large ecosystem of libraries and tools.
+
+Angular CLI:
+The Angular Command Line Interface simplifies the development workflow with commands for setting up projects, development, testing, and deployment.
+
+Disadvantages:
+
+Complexity:
+Angular’s extensive feature set and architecture can be challenging for beginners, resulting in a steep learning curve.
+
+Performance Issues:
+Large applications may experience performance problems if not managed properly, especially with Angular’s two-way data binding.
+
+Verbosity:
+Angular code can be verbose, requiring more boilerplate code compared to other frameworks, which can slow down development.
+
+Migration Challenges:
+Upgrading to newer versions of Angular can be difficult, often requiring significant refactoring and dealing with breaking changes.
+-------------------------------------------------------------------------------------------------------------------------
+
+Advantages of Angular over React:
+
+Bidirectional Data Binding:
+
+Angular supports bidirectional data binding, which means changes in the model automatically update the view and vice versa.
+ React, on the other hand, supports only unidirectional data binding and requires manual updates for changes in the view.
+
+Dependency Injection:
+Angular comes with built-in dependency injection, which simplifies the management of dependencies and enhances modularity and testability.
+React relies on third-party libraries or custom solutions for dependency injection.
+
+Full-Stack Development:
+Angular can be used for both web and mobile development (with Angular Native), making it versatile for full-stack applications.
+React is primarily used for building user interfaces and requires additional libraries or frameworks for mobile development (like React Native).
+
+Built-In Tools and Libraries:
+Angular provides a wide range of built-in tools, libraries, frameworks, and plugins, which streamline development and offer a comprehensive development environment. React often relies on third-party libraries to achieve similar functionality.
+
+TypeScript:
+Angular uses TypeScript, which adds static typing and other features that help in catching errors early and improving code quality.
+React primarily uses JavaScript, although it can be used with TypeScript as well.
+-------------------------------------------------------------------------------------------------------------------------
+
+Differences between AngularJS and Angular:
+
+Architecture:
+AngularJS: Uses the Model-View-Controller (MVC) architecture. 
+The Model contains business logic, the Controller processes information, and the View displays the information from the Model.
+Angular: Replaces controllers with Components.
+Components are directives with a predefined template, offering a more organized and modular approach to building user interfaces.
+
+Language:
+AngularJS: Uses JavaScript, a dynamically typed language.
+Angular: Uses TypeScript, a statically typed superset of JavaScript.
+TypeScript enhances performance and helps with developing larger applications due to its static typing features.
+
+Mobile Support:
+
+AngularJS: Does not provide built-in support for mobile development.
+Angular: Provides support for all popular mobile browsers, making it more suitable for mobile applications.
+
+Structure:
+AngularJS: Maintaining code for larger applications can become tedious due to its structure.
+Angular: Offers a better structure for maintaining code in larger applications, making it easier to manage and scale.
+
+-------------------------------------------------------------------------------------------------------------------------
+
+What are Single Page Applications (SPA)?
+Single page applications are web based applications that only need to be loaded once, with new functionality consisting of only minor changes to the user interface.
+It does not load new HTML pages to display the content of the new page, but rather generates it dynamically. 
+This is made feasible by JavaScript's ability to alter DOM components on the current page. 
+A Single Page Application method is speedier, resulting in a more consistent user experience.
+
+-------------------------------------------------------------------------------------------------------------------------
+What are templates in Angular?
+A template is a kind of HTML that instructs Angular about how to display a component. An Angular HTML template, like conventional HTML, produces a view, or user interface, in the browser, but with far more capabilities. Angular API evaluates an HTML template of a component, creates HTML, and renders it.
+
+There are two ways to create a template in an Angular component:
+
+Inline Template
+Linked Template
+-------------------------------------------------------------------------------------------------------------------------
+
+What is data binding in Angular?.
+
+Data binding in Angular is a mechanism that allows the synchronization of data between the model and the view. Angular provides four types of data binding:
+
+Interpolation (String Interpolation)
+Property Binding
+Event Binding
+Two-Way Binding
+Let's discuss each type with examples.
+
+1. Interpolation (String Interpolation)
+Interpolation allows you to embed expressions in your HTML. It uses double curly braces {{}}.
+
+Example:
+<!-- app.component.html -->
+<p>{{ message }}</p>
+// app.component.ts
+export class AppComponent {
+  message: string = 'Hello, Angular!';
+}
+..........................................
+2. Property Binding
+Property binding is used to bind values to the properties of HTML elements or Angular components.
+
+Example:
+
+html
+<!-- app.component.html -->
+<img [src]="imageUrl" alt="Angular Logo"> 
+// app.component.ts
+export class AppComponent {
+  imageUrl: string = 'https://angular.io/assets/images/logos/angular/angular.png';
+}
+Here, the src attribute of the img element is bound to the imageUrl property in the component.
+..........................................
+3. Event Binding
+Event binding is used to bind events to methods in the component. It uses parentheses ().
+..........................................
+
+4. Two-Way Binding
+Two-way binding allows for the synchronization of data in both directions: from the component to the view and from the view to the component.
+ It uses the ngModel directive and is achieved using [( )] syntax.
+
+ <!-- app.component.html -->
+<input [(ngModel)]="name" placeholder="Enter your name">
+<p>Hello, {{ name }}!</p>
+
+// app.component.ts
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html'
+})
+export class AppComponent {
+  name: string = '';
+}
+In this example, the value of the input field is bound to the name property in the component,
+and any changes in the input field will reflect in the name property and vice versa.
+-------------------------------------------------------------------------------------------------------------------------
+
+What are Decorators and their types in Angular?
+
+Decorators are a fundamental concept in TypeScript, and because Angular heavily relies on TypeScript, decorators have become an important element of Angular as well.
+Decorators are methods or design patterns that are labeled with a prefixed @ symbol and preceded by a class, method, or property.
+They enable the modification of a service, directive, or filter before it is utilized. 
+A decorator, in essence, provides configuration metadata that specifies how a component, class, or method should be processed, constructed, and used at runtime. 
+Angular includes a number of decorators which attach various types of metadata to classes, allowing the system to understand what all these classes signify and how they should function.
+
+There are four main types of decorators in Angular:
+
+Class Decorators
+Property Decorators
+Method Decorators
+Parameter Decorators
+
+1. Class Decorators
+Class decorators are used to attach metadata to a class. The most common class decorator in Angular is the @Component decorator, which defines a component.
+
+Example:
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-example',
+  template: '<h1>Hello, {{name}}!</h1>',
+  styleUrls: ['./example.component.css']
+})
+export class ExampleComponent {
+  name: string = 'Angular';
+}
+In this example, the @Component decorator is used to define a new component called ExampleComponent.
+The metadata includes the selector, template, and style URLs.
+........................................
+
+2. Property Decorators
+Property decorators are used to attach metadata to properties within a class. Common property decorators include @Input and @Output.
+Example using @Input:
+import { Component, Input } from '@angular/core';
+
+@Component({
+  selector: 'app-child',
+  template: '<p>{{childMessage}}</p>'
+})
+export class ChildComponent {
+  @Input() childMessage: string;
+}
+
+@Component({
+  selector: 'app-parent',
+  template: '<app-child [childMessage]="parentMessage"></app-child>'
+})
+export class ParentComponent {
+  parentMessage: string = 'Message from parent';
+}
+In this example, the @Input decorator allows the childMessage property in ChildComponent to receive data from the ParentComponent.
+........................................
+
+3. Method Decorators
+Method decorators are used to attach metadata to methods within a class. A common method decorator is @HostListener.
+
+Example using @HostListener:
+import { Directive, HostListener } from '@angular/core';
+
+@Directive({
+  selector: '[appClickTracker]'
+})
+export class ClickTrackerDirective {
+  @HostListener('click', ['$event'])
+  onClick(event: Event): void {
+    console.log('Element clicked:', event);
+  }
+}
+In this example, the @HostListener decorator is used to listen for click events on the host element
+and execute the onClick method whenever a click occurs.
+........................................
+
+4. Parameter Decorators
+Parameter decorators are used to attach metadata to the parameters of class constructors. A common parameter decorator is @Inject.
+
+Example using @Inject.
+import { Component, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+
+@Component({
+  selector: 'app-dialog',
+  template: '<p>{{data.message}}</p>'
+})
+export class DialogComponent {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {}
+}
+
+in this example, the @Inject decorator is used to inject the MAT_DIALOG_DATA into the DialogComponent constructor, allowing it to receive data passed to the dialog.
+
+These decorators are essential for defining and configuring Angular applications, making it easier to create complex functionalities with concise and readable code.
+-------------------------------------------------------------------------------------------------------------------------
+
+Annotations in Angular are a specific type of metadata that provide additional information about a class and its behavior. 
+They are a key feature of Angular and are closely related to decorators. 
+Annotations are used by Angular's compiler to understand the structure and configuration of an Angular application.
+
+Annotations in Angular are essentially metadata attached to a class via decorators, and they describe the class's configuration in terms of the framework. 
+The most common annotations in Angular are @Component, @Directive, @Pipe, @Injectable, and @NgModule.
+-------------------------------------------------------------------------------------------------------------------------
+
+What are HTTP interceptors ?
+
+HTTP interceptors in Angular are a powerful feature that allows you to inspect and modify HTTP requests and responses.
+They are part of the Angular HTTP client module and are implemented as services that implement the HttpInterceptor interface.
+
+Key Features of HTTP Interceptors
+
+Modify Requests: Interceptors can modify HTTP requests before they are sent to the server. For example, you can add headers, modify request parameters, or log requests.
+
+Handle Responses: Interceptors can inspect and modify responses before they reach the application code.
+This is useful for handling common tasks such as error handling, logging, or modifying the response data.
+
+Global HTTP Configuration: Interceptors apply to all HTTP requests made by the Angular application, making them a convenient way to implement cross-cutting concerns such as authentication, logging, and error handling.
+.....................................
+Implementing an HTTP Interceptor
+To create an HTTP interceptor, you need to implement the HttpInterceptor interface, which requires you to define the intercept method.
+
+Here's a step-by-step guide to creating an HTTP interceptor:
+
+Create the Interceptor Service:
+
+import { Injectable } from '@angular/core';
+import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+@Injectable()
+export class AuthInterceptor implements HttpInterceptor {
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    const authToken = 'your-auth-token';
+
+    // Clone the request to add the new header
+    const authReq = req.clone({
+      headers: req.headers.set('Authorization', `Bearer ${authToken}`)
+    });
+
+    // Pass on the cloned request instead of the original request
+    return next.handle(authReq);
+  }
+}
+
+2.Provide the Interceptor:
+You need to register the interceptor in your Angular module using the HTTP_INTERCEPTORS token.
+import { NgModule } from '@angular/core';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { AuthInterceptor } from './auth.interceptor';
+
+@NgModule({
+  imports: [HttpClientModule],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
+  ]
+})
+export class AppModule { }
+The multi: true option allows multiple interceptors to be registered.
+
+WHAT is "multi:true" ?
+
+In Angular, the multi: true option is used when providing services to allow multiple values to be associated with a single token. 
+This is particularly useful with HTTP interceptors because it allows you to register multiple interceptors that will be applied in the order they are provided.
+
+Why multi: true is Important
+
+When you set multi: true for a provider, Angular expects the value of the provider to be an array, and it will add your provided service to this array. 
+Without multi: true, Angular would overwrite any previous providers for the same token, meaning you could only have one interceptor.
+
+Example with Multiple Interceptors
+Let's say you want to create two different interceptors: one for adding an authorization token and another for logging HTTP requests and responses.
+
+1.Authorization Interceptor:
+
+import { Injectable } from '@angular/core';
+import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+@Injectable()
+export class AuthInterceptor implements HttpInterceptor {
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    const authToken = 'your-auth-token';
+
+    const authReq = req.clone({
+      headers: req.headers.set('Authorization', `Bearer ${authToken}`)
+    });
+
+    return next.handle(authReq);
+  }
+}
+
+2.Logging Interceptor:
+
+import { Injectable } from '@angular/core';
+import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+
+@Injectable()
+export class LoggingInterceptor implements HttpInterceptor {
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    console.log('HTTP Request:', req);
+
+    return next.handle(req).pipe(
+      tap(
+        event => console.log('HTTP Response:', event),
+        error => console.error('HTTP Error:', error)
+      )
+    );
+  }
+}
+
+3.Providing Multiple Interceptors:
+In your AppModule, you register both interceptors using the HTTP_INTERCEPTORS token and set multi: true.
+
+import { NgModule } from '@angular/core';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { AuthInterceptor } from './auth.interceptor';
+import { LoggingInterceptor } from './logging.interceptor';
+
+@NgModule({
+  imports: [HttpClientModule],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: LoggingInterceptor,
+      multi: true
+    }
+  ]
+})
+export class AppModule { }
+
+What Happens with multi: true
+Angular collects all the interceptors into an array associated with the HTTP_INTERCEPTORS token.
+When an HTTP request is made, Angular processes each interceptor in the order they were provided.
+Each interceptor gets the opportunity to modify the request or handle the response before passing it to the next interceptor.
+
+Summary
+multi: true: Allows multiple interceptors (or any service) to be registered under the same token.
+Order of Interceptors: Interceptors are executed in the order they are provided.
+Benefits: Enables separation of concerns, such as separate interceptors for authentication, logging, error handling, etc.
+-------------------------------------------------------------------------------------------------------------------------
+
+What is view encapsulation in Angular?
+
+View encapsulation in Angular is a mechanism to apply styles to components in a way that they are scoped to the component, preventing them from affecting other parts of the application. Angular provides three encapsulation modes:
+
+Emulated (default)
+None
+ShadowDom
+
+1. Emulated
+Emulated encapsulation mode emulates the behavior of Shadow DOM by adding unique attributes to component elements and their styles. 
+This ensures that styles defined in a component do not leak out and affect other components.
+
+Example:
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-emulated',
+  template: `
+    <div class="example">Emulated Encapsulation</div>
+  `,
+  styles: [`
+    .example {
+      color: red;
+    }
+  `],
+  encapsulation: ViewEncapsulation.Emulated
+})
+export class EmulatedComponent { }
+
+In this example, Angular will modify the CSS classes and attributes to ensure the styles are scoped to the EmulatedComponent.
+
+Rendered HTML:
+<div _ngcontent-c0 class="example">Emulated Encapsulation</div>
+<style>
+  .example[_ngcontent-c0] {
+    color: red;
+  }
+</style>
+
+.......................................................
+
+2. None
+None encapsulation mode means no encapsulation. Styles defined in a component will be applied globally, affecting other components in the application.
+
+import { Component, ViewEncapsulation } from '@angular/core';
+
+@Component({
+  selector: 'app-none',
+  template: `
+    <div class="example">No Encapsulation</div>
+  `,
+  styles: [`
+    .example {
+      color: blue;
+    }
+  `],
+  encapsulation: ViewEncapsulation.None
+})
+export class NoneComponent { }
+
+In this example, the styles defined in NoneComponent will apply to all elements with the class example across the application.
+
+Rendered HTML:
+<div class="example">No Encapsulation</div>
+<style>
+  .example {
+    color: blue;
+  }
+</style>
+
+.......................................................
+
+3. Shadow DOM Encapsulation
+ShadowDom encapsulation leverages the native Shadow DOM feature available in modern browsers. 
+Shadow DOM allows you to attach a hidden, separate DOM tree to an element, providing true encapsulation of styles and markup.
+
+When you use ShadowDom encapsulation in Angular, the component's template and styles are encapsulated inside a shadow root, creating a boundary that prevents styles from leaking out or being affected by global styles.
+
+Example: Shadow DOM Encapsulation
+Let's walk through a detailed example to illustrate how ShadowDom works.
+
+Component Definition:
+import { Component, ViewEncapsulation } from '@angular/core';
+
+@Component({
+  selector: 'app-shadow-dom',
+  template: `
+    <div class="example">Shadow DOM Encapsulation</div>
+  `,
+  styles: [`
+    .example {
+      color: green;
+    }
+  `],
+  encapsulation: ViewEncapsulation.ShadowDom
+})
+export class ShadowDomComponent { }
+
+Rendered HTML:
+When Angular renders this component in the DOM, 
+it creates a shadow root and attaches the component's template and styles inside this shadow root.
+
+<app-shadow-dom>
+  #shadow-root (closed)
+  <style>
+    .example {
+      color: green;
+    }
+  </style>
+  <div class="example">Shadow DOM Encapsulation</div>
+</app-shadow-dom>
+Key Points of Shadow DOM Encapsulation
+Isolation:
+
+The styles defined inside the shadow root do not affect elements outside the shadow DOM.
+External styles do not affect elements inside the shadow DOM.
+Encapsulation:
+
+The component's template and styles are fully encapsulated within the shadow root.
+This provides a clean separation between the component's internal styles and the rest of the application.
+Browser Support:
+
+Modern browsers support Shadow DOM natively. However, older browsers might require polyfills to fully support Shadow DOM features.
+-------------------------------------------------------------------------------------------------------------------------
+
+
+How to implement lazy loading in angular ?
+
+Lazy loading in Angular is a design pattern that allows you to load feature modules only when they are needed. 
+This can significantly improve the performance of your application by reducing the initial load time. 
+Lazy loading in Angular is typically implemented using the Angular Router.
+
+Steps to Implement Lazy Loading in Angular
+-Create a Feature Module
+-Configure the Routes
+-Set Up the Lazy Loading Route in the App Module
+
+ Generate the Module and Component
+
+ng generate module admin --route admin --module app.module
+ng generate component admin/admin-dashboard
+
+admin-routing.module.ts
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
+
+const routes: Routes = [
+  { path: '', component: AdminDashboardComponent }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class AdminRoutingModule { }
+
+
+admin.module.ts
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
+import { AdminRoutingModule } from './admin-routing.module';
+
+@NgModule({
+  declarations: [AdminDashboardComponent],
+  imports: [
+    CommonModule,
+    AdminRoutingModule
+  ]
+})
+export class AdminModule { }
+
+
+app-routing.module.ts
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+
+const routes: Routes = [
+  { path: 'admin', loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule) },
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
+  { path: '**', redirectTo: '/home' }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+
+
+Here's an ASCII diagram showing a typical folder structure for a lazy-loaded module in an Angular application.
+
+my-angular-app/
+├── src/
+│   ├── app/
+│   │   ├── admin/
+│   │   │   ├── admin-dashboard/
+│   │   │   │   ├── admin-dashboard.component.ts
+│   │   │   │   ├── admin-dashboard.component.html
+│   │   │   │   ├── admin-dashboard.component.css
+│   │   │   ├── admin-routing.module.ts
+│   │   │   ├── admin.module.ts
+│   │   ├── app-routing.module.ts
+│   │   ├── app.component.ts
+│   │   ├── app.component.html
+│   │   ├── app.component.css
+│   ├── assets/
+│   ├── environments/
+│   ├── styles.css
+
+
+The ng generate module admin --route admin --module app.
+module command is used in Angular CLI to generate a new module with routing and configure it for lazy loading. Let’s break down this command and its syntax:
+
+Command Breakdown
+ng generate module: This is the Angular CLI command to generate a new module.
+admin: This specifies the name of the module you want to create. In this case, the module will be named AdminModule.
+--route admin: This flag tells Angular CLI to create a route configuration for the new module.
+It sets up the lazy loading for the module and creates a route for it. The path for this route will be admin.
+--module app.module: This flag specifies that the route configuration for lazy loading should be added to the AppModule.
+This ensures that the new module is registered for lazy loading in the main application module.
+
+-------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
