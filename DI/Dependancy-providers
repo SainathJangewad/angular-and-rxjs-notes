@@ -1,0 +1,278 @@
+useClass Provider
+
+The useClass provider lets you specify a class that Angular should instantiate and provide when a particular token is requested.
+This class doesn't necessarily have to be the same as the token; it can be an alternative implementation.
+
+Syntax:
+providers: [
+  { provide: Token, useClass: Class }
+]
+
+provide: The DI token, typically a class or an interface.
+useClass: The class to instantiate when the token is requested.
+
+You can use this type of provider to substitute an alternative implementation for a common or default class. The alternative implementation can, for example, implement a different strategy, extend the default class, or emulate the behavior of the real class in a test case.
+....................................................
+In the following example, BetterLogger would be instantiated when the Logger dependency is requested in a component or any other class:
+
+src/app/app.component.ts
+[{ provide: Logger, useClass: BetterLogger }]
+
+If the alternative class providers have their own dependencies, specify both providers in the providers metadata property of the parent module or component:
+
+src/app/app.component.ts
+[
+  UserService, // dependency needed in `EvenBetterLogger`.
+  { provide: Logger, useClass: EvenBetterLogger },// Depends on UserService
+]
+
+Why Mention UserService Before { provide: Logger, useClass: EvenBetterLogger }
+Dependency Resolution: EvenBetterLogger depends on UserService (via its constructor). Angular must know how to provide UserService before it can instantiate EvenBetterLogger.
+
+Order Matters: In the providers array, UserService must be listed first so that it’s available for injection into EvenBetterLogger.
+
+Error Prevention: Without UserService in providers, Angular will throw a NullInjectorError when resolving dependencies for EvenBetterLogger.
+
+
+In this example, EvenBetterLogger displays the user name in the log message. This logger gets the user from an injected UserService instance:
+
+src/app/even-better-logger.component.ts
+
+@Injectable()
+export class EvenBetterLogger extends Logger {
+  constructor(private userService: UserService) {}
+  override log(message: string) {
+    const name = this.userService.user.name;
+    super.log(`Message to ${name}: ${message}`);
+  }
+}
+Angular DI knows how to construct the UserService dependency, since it has been configured above and is available in the injector.
+<!-- --------------------------------------------------------------------------------------------------------------------------- -->
+
+Alias Providers: useExisting
+
+In Angular, the useExisting provider allows you to create an alias for an existing provider. Instead of instantiating a new class or service, Angular reuses an already provided instance. This is useful when you want to assign multiple tokens to the same service instance.
+
+Syntax:
+{ provide: NewToken, useExisting: ExistingToken }
+
+provide: The new token (alias) you want to use.
+useExisting: The existing token or service that you want to alias.
+
+src/app/app.component.ts
+[
+  NewLogger,
+  // Alias OldLogger w/ reference to NewLogger
+  { provide: OldLogger, useExisting: NewLogger},
+]
+Note: Ensure you do not alias OldLogger to NewLogger with useClass, as this creates two different NewLogger instances.
+
+When to Use
+When multiple services or components need to refer to the same instance but should have different names (tokens).
+To avoid creating duplicate instances of services with the same functionality.
+<!-- --------------------------------------------------------------------------------------------------------------------------- -->
+
+Factory Providers: useFactory
+
+The useFactory provider in Angular allows you to create and provide a service using a factory function. This is useful when you need more control over the instantiation of a service, such as creating instances dynamically based on some condition or with specific parameters.
+
+Syntax:
+{ provide: ServiceToken, useFactory: factoryFunction, deps: [dependencies] }
+
+provide: The DI token (service or value) you want to provide.
+useFactory: The factory function that returns the instance of the service.
+deps (optional): An array of dependencies that should be injected into the factory function.
+
+When to Use
+When you need to control the instantiation of a service, especially when it depends on dynamic conditions.
+When you need to inject different instances of a service based on the environment or configuration.
+
+Example: Controlling Access to Secret Heroes
+
+Service: HeroService
+class HeroService {
+  constructor(private logger: Logger, private isAuthorized: boolean) {}
+  getHeroes() {
+    return HEROES.filter(hero => this.isAuthorized || !hero.isSecret);
+  }
+}
+
+Factory Function:
+src/app/heroes/hero.service.provider.ts
+const heroServiceFactory = (logger: Logger, userService: UserService) =>
+  new HeroService(logger, userService.user.isAuthorized);
+
+
+  Factory Provider:
+  src/app/heroes/hero.service.provider.ts
+  export const heroServiceProvider = {
+  provide: HeroService,
+  useFactory: heroServiceFactory,
+  deps: [Logger, UserService],
+};
+
+How It Works:
+Angular calls heroServiceFactory to create HeroService.
+Injects Logger and UserService based on deps.
+Factory function uses userService.user.isAuthorized to decide access and returns the service instance.
+Benefits:
+Dynamic Instantiation: Create services based on runtime logic.
+Custom Dependencies: Pass calculated or external values during service creation.
+Reusability: Exporting the provider makes it reusable across modules.
+<!-- ----------------------------------------------------------------------------------------------------------- -->
+
+Value Providers: useValue
+
+A value provider in Angular allows you to supply a fixed or constant value for a dependency instead of creating it dynamically. This is useful for things like configuration settings, static data, or shared constants across the app.
+
+
+Use this technique to provide runtime configuration constants such as website base addresses and feature flags. You can also use a value provider in a unit test to provide mock data in place of a production data service.
+
+Using an InjectionToken object
+Use an InjectionToken object as provider token for non-class dependencies. The following example defines a token, APP_CONFIG. of the type InjectionToken:
+
+src/app/app.config.ts
+import { InjectionToken } from '@angular/core';
+export interface AppConfig {
+  title: string;
+}
+export const APP_CONFIG = new InjectionToken<AppConfig>('app.config description');
+
+The optional type parameter, <AppConfig>, and the token description (optional but recommended), app.config description, specify the token's purpose.
+
+Next, register the dependency provider in the component using the InjectionToken object of APP_CONFIG:
+
+src/app/app.component.ts
+const MY_APP_CONFIG_VARIABLE: AppConfig = {
+  title: 'Hello',
+};
+providers: [{ provide: APP_CONFIG, useValue: MY_APP_CONFIG_VARIABLE }]
+
+Now, inject the configuration object into the constructor with the @Inject() parameter decorator:
+
+src/app/app.component.ts
+export class AppComponent {
+  constructor(@Inject(APP_CONFIG) config: AppConfig) {
+    this.title = config.title;
+  }
+}
+<!-- ......................................................................... -->
+In Angular, InjectionToken is used as a provider token for dependencies that are not tied to a class, such as objects, arrays, or primitive values (e.g., configuration objects, constants). Since these are not classes, Angular cannot automatically determine how to provide them, so you need to explicitly create a token.
+
+Why Use InjectionToken?
+Non-Class Dependencies: Angular typically uses class names as provider tokens. For non-class values like objects, arrays, or strings, you need a unique token to register and inject these values.
+Type Safety: InjectionToken allows specifying a type for the value being provided, helping with compile-time type checking.
+Avoid Collisions: Strings can also be used as tokens, but they are prone to name collisions. InjectionToken ensures a unique identifier
+
+How to Use InjectionToken
+1. Create the InjectionToken
+Use InjectionToken to create a unique and type-safe token.
+
+import { InjectionToken } from '@angular/core';
+
+export const APP_CONFIG = new InjectionToken<AppConfig>('app.config');
+
+interface AppConfig {
+  apiUrl: string;
+  timeout: number;
+}
+
+2. Provide the Token in the Module
+Use the APP_CONFIG token with useValue to provide the configuration.
+
+@NgModule({
+  providers: [
+    { 
+      provide: APP_CONFIG, 
+      useValue: { apiUrl: 'https://api.example.com', timeout: 3000 } 
+    },
+  ],
+})
+export class AppModule {}
+
+3. Inject the Token in a Component or Service
+
+Use the @Inject decorator to specify the token when injecting the value.
+
+import { Component, Inject } from '@angular/core';
+import { APP_CONFIG } from './app.config';
+
+@Component({
+  selector: 'app-root',
+  template: `<h1>InjectionToken Example</h1>`,
+})
+export class AppComponent {
+  constructor(@Inject(APP_CONFIG) private config: { apiUrl: string; timeout: number }) {
+    console.log(`API URL: ${this.config.apiUrl}`);
+    console.log(`Timeout: ${this.config.timeout}`);
+  }
+}
+
+Use Cases
+App Configuration: Injecting static configuration data like API URLs or environment settings.
+Feature Flags: Injecting boolean or object-based feature flags.
+Shared Constants: Injecting reusable constants like dropdown options.
+<!-- ------------------------------------------------------------------------------------------ -->
+
+Interfaces and DI
+
+Though the TypeScript AppConfig interface supports typing within the class, the AppConfig interface plays no role in DI. In TypeScript, an interface is a design-time artifact, and does not have a runtime representation, or token, that the DI framework can use.
+
+When the TypeScript transpiles to JavaScript, the interface disappears because JavaScript doesn't have interfaces. Because there is no interface for Angular to find at runtime, the interface cannot be a token, nor can you inject it:
+
+src/app/app.component.ts
+// Can't use interface as provider token
+[{ provide: AppConfig, useValue: MY_APP_CONFIG_VARIABLE })]
+
+src/app/app.component.ts
+export class AppComponent {
+  // Can't inject using the interface as the parameter type
+  constructor(private config: AppConfig) {}
+}
+
+
+Let's break it down:
+
+What is an interface in TypeScript?
+
+An interface in TypeScript is like a blueprint that defines the structure of an object (e.g., what properties it has and their types). It is only used during development to help catch errors.
+What happens to interfaces at runtime?
+
+When TypeScript is converted (transpiled) into JavaScript, the interface disappears because JavaScript doesn’t have the concept of interfaces. It's only a "design-time" tool.
+What is Dependency Injection (DI)?
+
+DI is a system in Angular that provides instances of classes or values to parts of your application. For this to work, Angular needs a token to identify what it should provide.
+Why can't you use an interface as a token for DI?
+
+Since interfaces don’t exist in the JavaScript version of your code, Angular cannot "see" the interface during runtime. It has no way to use the interface as a token to provide the corresponding value.
+
+Examples in Plain English:
+Trying to Use an Interface in DI
+You might write:
+
+[{ provide: AppConfig, useValue: MY_APP_CONFIG_VARIABLE }]
+
+Here, AppConfig is an interface. But Angular can't use it because it disappears after transpilation.
+
+Trying to Inject an Interface
+You might try:
+
+constructor(private config: AppConfig) {}
+Here, you’re asking Angular to inject a value for AppConfig. But Angular can’t do this because it doesn’t know what AppConfig is (it’s gone in JavaScript).
+
+What Should You Do Instead?
+You can use a class or a unique token (like a string or InjectionToken) for DI, because these exist at runtime. For example:
+
+import { InjectionToken } from '@angular/core';
+
+// Create a token for DI
+export const APP_CONFIG = new InjectionToken<AppConfig>('app.config');
+
+// Use the token to provide the value
+providers: [{ provide: APP_CONFIG, useValue: MY_APP_CONFIG_VARIABLE }]
+
+// Inject using the token
+constructor(@Inject(APP_CONFIG) private config: AppConfig) {}
+
+This way, Angular knows what to inject because APP_CONFIG exists at runtime.
+

@@ -99,7 +99,9 @@ subject.next('C');
 Output:
 Subscriber 1: A
 Subscriber 1: B
+Subscriber 1: C
 Subscriber 2: C
+
 ....................................................
 
 Example:
@@ -130,11 +132,13 @@ behaviorSubject.subscribe({
 behaviorSubject.next('C');
 
 Output:
-Subscriber 1: Initial Value
-Subscriber 1: A
-Subscriber 1: B
-Subscriber 2: B
+Subscriber 1: Initial Value  // First subscriber gets the initial value upon subscription.
+Subscriber 1: A             // First subscriber receives 'A'.
+Subscriber 1: B             // First subscriber receives 'B'.
+Subscriber 2: B             // Second subscriber subscribes and gets the most recent value, which is 'B'.
+Subscriber 1: C             // Both subscribers receive 'C'.
 Subscriber 2: C
+
 
 ....................................................
 ReplaySubject
@@ -199,6 +203,22 @@ Subscriber 1: B
 Subscriber 2: B
 
 In this example, only the last value 'B' is emitted to subscribers after the AsyncSubject completes.
+
+First Subscriber:
+
+When asyncSubject.next('A') is called, no values are emitted yet because AsyncSubject doesn't emit anything until complete() is called.
+When asyncSubject.next('B') is called, again, nothing is emitted yet, but AsyncSubject stores 'B' as the most recent value.
+When asyncSubject.complete() is called, the last emitted value 'B' is sent to all existing subscribers. Therefore, the first subscriber receives B and prints:
+
+Second Subscriber:
+
+After the complete() method has been called, AsyncSubject still holds onto the last emitted value ('B').
+When the second subscriber subscribes, it immediately receives the last value stored by the AsyncSubject because it had already completed. 
+So, the second subscriber also receives B and prints it .
+
+Key Concept:
+AsyncSubject only emits the last value when it's completed.
+All subscribers (whether they subscribe before or after the subject completes) will receive that last value if the subject has been completed.
 -----------------------------------------------------------------------------------------------------
 
 In RxJS, a Scheduler is a tool that controls when and how tasks are executed, including when observables are subscribed to, when values are emitted, and when operators are applied. 
@@ -206,8 +226,61 @@ In RxJS, a Scheduler is a tool that controls when and how tasks are executed, in
 Types of schedulers: queueScheduler, asapScheduler, asyncScheduler, animationFrameScheduler
 -----------------------------------------------------------------------------------------------------
 
+Create a custom operator.
+
+Steps to Create a Custom Operator
+Define the Custom Operator Function:
+
+It should accept an observable as input and return a transformed observable.
+It can use operators like map, filter, or mergeMap internally to manipulate the stream.
+Create the Operator Using Observable.create or pipe:
+
+You can define custom logic in your operator, and optionally use other RxJS operators inside your custom operator.
+
+Example 1: Simple Custom Operator (Log Values)
+Let’s say we want to create a custom operator that logs each value emitted by the observable.
 
 
+import { Observable } from 'rxjs';
+
+function logValues<T>(source: Observable<T>): Observable<T> {
+  return new Observable<T>(observer => {
+    source.subscribe({
+      next(value) {
+        console.log(value); // Log the value
+        observer.next(value); // Pass the value to the observer
+      },
+      error(err) {
+        observer.error(err); // Pass the error
+      },
+      complete() {
+        observer.complete(); // Complete the stream
+      }
+    });
+  });
+}
+
+// Usage
+import { of } from 'rxjs';
+
+const source$ = of(1, 2, 3);
+
+source$.pipe(
+  logValues
+).subscribe({
+  next: value => console.log(`Emitted: ${value}`),
+  complete: () => console.log('Completed')
+});
+
+Output:
+1
+Emitted: 1
+2
+Emitted: 2
+3
+Emitted: 3
+Completed
+-----------------------------------------------------------------------------------------------------
 
 
 

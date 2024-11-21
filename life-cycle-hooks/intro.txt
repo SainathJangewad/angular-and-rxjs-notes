@@ -37,6 +37,10 @@ ngDoCheck() {
   console.log('ngDoCheck - checking user data');
 }
 Use this hook if you need to implement custom change detection logic. It's called with every change detection cycle.
+Performance Consideration
+
+Be mindful of performance when using ngDoCheck(), as it runs frequently during the change detection cycle.
+Ensure that the logic within it is optimized to avoid potential performance issues.
 ---------------------------------------------------------------
 
 ngAfterContentInit
@@ -48,6 +52,50 @@ ngAfterContentInit() {
 }
 Use this hook to initialize any logic that depends on projected content.
 Called once after the first ngDoCheck().
+
+In Angular, "projected content" refers to content that is passed into a component from a parent component using Angular's content projection feature, often with <ng-content>. 
+This allows you to create reusable components that can accept and render custom content defined by the parent component.
+
+What "Respond after Angular projects external content into the component's view" Means
+When Angular projects external content into a component's view:
+
+Content Projection: You define a placeholder in your component's template using <ng-content>, which allows the parent component to insert HTML or other components.
+
+ngAfterContentInit Lifecycle Hook: This hook is called after Angular has projected the content into the component.
+At this point, the component can access the projected content and perform any initialization or logic that depends on it.
+
+Example Scenario
+Consider you have a parent component that uses a custom card component, where you want to project some content into the card:
+
+Parent Component Template:
+<app-card>
+  <h2>Title</h2>
+  <p>This is the projected content inside the card.</p>
+</app-card>
+
+Card Component:
+
+import { Component, AfterContentInit } from '@angular/core';
+
+@Component({
+  selector: 'app-card',
+  template: `
+    <div class="card">
+      <ng-content></ng-content> <!-- Placeholder for projected content -->
+    </div>
+  `
+})
+export class CardComponent implements AfterContentInit {
+  ngAfterContentInit() {
+    console.log('ngAfterContentInit - content initialized');
+    // Here you can access the projected content if needed
+  }
+}
+
+In Summary
+Purpose of ngAfterContentInit: This lifecycle hook allows you to react to the initialization of content that has been projected into your component.
+When it's Called: It is called once after Angular finishes projecting the external content, right after the first ngDoCheck() call.
+Use Cases: You might want to manipulate the projected content, apply certain styles, or initialize component logic that relies on this external content during this phase.
 ---------------------------------------------------------------
 
 ngAfterContentChecked
@@ -94,7 +142,7 @@ This is the place to perform cleanup, such as unsubscribing from observables or 
 ---------------------------------------------------------------
 
 
- Execution Order
+Execution Order
 ngOnChanges()
 ngOnInit()
 ngDoCheck()

@@ -1,0 +1,104 @@
+When you develop a smaller part of your system, like a module or a class, you may need to use features from other classes.
+For example, you may need an HTTP service to make backend calls. Dependency Injection, or DI, is a design pattern and mechanism for creating and delivering some parts of an application to other parts of an application that require them. 
+Angular supports this design pattern and you can use it in your applications to increase flexibility and modularity.
+
+In Angular, dependencies are typically services, but they also can be values, such as strings or functions.
+An injector for an application (created automatically during bootstrap) instantiates dependencies when needed, using a configured provider of the service or value.
+---------------------------------------------------------------------------------------------------------------------------------
+
+Understanding Dependency Injection in Angular
+
+Overview:
+Dependency Injection (DI) is a core concept in Angular. It allows Angular classes (Components, Directives, Pipes, and Injectables) to request and use dependencies. 
+The DI system consists of:
+
+Dependency Consumer: Requests a service.
+
+Dependency Provider: Supplies the service.
+
+Injector:
+Manages instances of services.
+Checks if a service is available or creates a new instance if necessary.
+Angular creates a root injector during application bootstrap.
+---------------------------------------------------------------------------------------------------------------------------------
+
+Providing Dependencies:
+
+1.Preferred: At the Application Root Level (providedIn):
+
+Declare in @Injectable({ providedIn: 'root' }).
+Creates a single, shared instance available throughout the application.
+Enables tree-shaking: Unused services can be effectively removed by Angular and JavaScript code optimizers.
+
+Example:
+@Injectable({
+  providedIn: 'root'
+})
+class HeroService {}
+
+2.At the Component Level:
+
+Use the providers field in @Component decorator.
+In this case the service becomes available to all instances of this component and other components and directives used in the template.
+
+Example:
+@Component({
+  selector: 'hero-list',
+  template: '...',
+  providers: [HeroService]
+})
+class HeroListComponent {}
+
+3.Using ApplicationConfig:
+
+Provide services at the application level through ApplicationConfig.
+Example:
+export const appConfig: ApplicationConfig = {
+  providers: [HeroService],
+};
+In main.ts,
+bootstrapApplication(AppComponent, appConfig);
+
+4.NgModule-Based Applications:
+
+Use the providers field in @NgModule decorator.
+
+Service available to all module declarations or shared modules.
+
+Example:
+@NgModule({
+  declarations: [AppComponent, HeroListComponent],
+  imports: [BrowserModule],
+  providers: [HeroService], // Service provided here
+  bootstrap: [AppComponent]
+})
+export class AppModule {}
+---------------------------------------------------------------------------------------------------------------------------------
+
+Injecting/Consuming Dependencies:
+
+Constructor Injection:
+@Component({ … })
+class HeroListComponent {
+  constructor(private service: HeroService) {}
+}
+
+Using inject Method:
+@Component({ … })
+class HeroListComponent {
+  private service = inject(HeroService);
+}
+
+
+When Angular discovers that a component depends on a service, it first checks if the injector has any existing instances of that service. 
+If a requested service instance doesn't yet exist, the injector creates one using the registered provider, and adds it to the injector before returning the service to Angular.
+
+When all requested services have been resolved and returned, Angular can call the component's constructor with those services as arguments.
+---------------------------------------------------------------------------------------------------------------------------------
+Notes:
+
+Tree-shaking: Using providedIn: 'root' allows Angular and optimizers to remove unused services from the final bundle.
+Providing a service using other methods includes it in the application even if unused, potentially affecting the bundle size.
+
+
+

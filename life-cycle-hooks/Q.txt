@@ -1,5 +1,6 @@
 1. What is the difference between ngOnInit() and constructor() in Angular?
-The Constructor is a default method of the class that is executed when the class is instantiated and ensures proper initialisation of fields in the class and its subclasses. Angular, or better Dependency Injector (DI), analyses the constructor parameters and when it creates a new instance by calling new MyClass() it tries to find providers that match the types of the constructor parameters, resolves them and passes them to the constructor like
+The Constructor is a default method of the class that is executed when the class is instantiated and ensures proper initialisation of fields in the class and its subclasses.
+Angular, or better Dependency Injector (DI), analyses the constructor parameters and when it creates a new instance by calling new MyClass() it tries to find providers that match the types of the constructor parameters, resolves them and passes them to the constructor like
 
 new MyClass(someArg);
 ngOnInit is a life cycle hook called by Angular to indicate that Angular is done creating the component.
@@ -18,4 +19,121 @@ Purpose:
 Constructor: Used for dependency injection and initializing simple properties.
 ngOnInit: Used for more complex initialization that requires the component’s input properties to be set.
 
+Usage Perspective
+Constructor:
+
+Primarily used for dependency injection (DI) in Angular.
+Can also be used for initial registrations (e.g., router-outlet).
+Common practice is to minimize logic in the constructor.
+ngOnInit:
+
+Called after the component's DOM is created, dependencies are injected, and input bindings are processed.
+A good place to perform initialization logic since all required information is available.
+Common practice to use ngOnInit for any initialization, even if it doesn't rely on DI, DOM, or input bindings.
+
+The constructor is used to create the class while the onInit is used to build the component itself.
+
+Constructor vs. ngOnInit:
+
+The constructor is called when a class is instantiated. In Angular, this means that the constructor is used to set up class properties and inject dependencies, but the component is not fully initialized at this point.
+The ngOnInit lifecycle hook is called after Angular has fully initialized the component. This is where you should place initialization code that requires the component's view to be fully set up, such as making API calls or initializing values that depend on the component’s template.
+Order of Execution:
+
+The constructor is executed first, and it's the ideal place to inject services or set up basic properties.
+After the constructor, Angular calls the ngOnInit method, ensuring that the component's properties, bindings, and child components are ready for use.
+Summary
 ---------------------------------------------------------------
+
+2. What are life cycle hooks in Angular and why are they important?
+A: Life cycle hooks are special methods in Angular that are called at specific stages in a component or directive's life cycle.
+They are important because they allow developers to execute custom code at various stages of the component or directive's life cycle,
+enabling better control over the behavior and state of the application.
+
+---------------------------------------------------------------
+
+3.How does the ngOnInit() hook work, and when is it called?
+A: The ngOnInit() hook is a life cycle hook that is called once after the Angular component or directive has been initialized, specifically after the first ngOnChanges() call.
+It is typically used to initialize component properties, fetch data, or set up event listeners.
+
+---------------------------------------------------------------
+
+ 4.Explain the ngOnChanges() hook and give an example of its use.
+ The ngOnChanges() lifecycle hook in Angular is called when any data-bound input property of a component changes.
+ This hook receives a SimpleChanges object, which contains the current and previous values of the changed properties.
+ It's particularly useful for responding to changes in input properties and performing actions based on those changes.
+
+ Key Points:
+It is called before ngOnInit() and whenever one or more data-bound input properties change.
+It can be used to implement complex logic based on the values of the inputs.
+The SimpleChanges object allows you to access both the previous and current values of the changed input properties.
+
+ Exmaple :
+ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+
+@Component({
+  selector: 'app-child',
+  template: `
+    <p>Current Value: {{ value }}</p>
+    <p>Previous Value: {{ previousValue }}</p>
+  `,
+})
+export class ChildComponent implements OnChanges {
+  @Input() value: number;
+  previousValue: number;
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['value']) {
+      this.previousValue = changes['value'].previousValue;
+    }
+  }
+}
+
+---------------------------------------------------------------
+
+4.What is the purpose of the ngDoCheck() hook, and when should it be used?
+A: The ngDoCheck() hook is a life cycle hook called whenever change detection runs.
+It is used for implementing custom change detection logic, such as checking for changes in objects or arrays not detected by Angular's default change detection mechanism.
+---------------------------------------------------------------
+
+5.Describe the ngAfterContentInit() hook and its role in the component life cycle.
+A: The ngAfterContentInit() hook is a life cycle hook called once after Angular projects external content into the component's view.
+It is useful for initializing component properties or logic that depend on the projected content.
+---------------------------------------------------------------
+
+6.How does the ngAfterContentChecked() hook work, and when is it called?
+A: The ngAfterContentChecked() hook is a life cycle hook called after Angular checks the content projected into the component, as well as the component's view.
+It is called after each change detection cycle and is useful for reacting to content changes or performing additional checks
+
+---------------------------------------------------------------
+
+7.Explain the ngAfterViewInit() hook and provide a use case for it.
+A: The ngAfterViewInit() hook is a life cycle hook called once after Angular initializes the component's view and child views.
+It is useful for manipulating DOM elements or interacting with child components after they have been fully rendered.
+
+Use case: Accessing a child component or a DOM element using the ViewChild decorator and performing some action on it.
+
+---------------------------------------------------------------
+8.Describe the ngOnDestroy() hook and its importance in the Angular life cycle.
+A: The ngOnDestroy() hook is a life cycle hook called just before Angular destroys the component or directive.
+It is important for cleaning up resources, such as subscriptions or event listeners, to prevent memory leaks and ensure proper application performance.
+
+---------------------------------------------------------------
+
+ How do life cycle hooks differ between Angular components and directives?
+A directive has the same set of lifecycle hooks, minus the hooks that are specific to component content and views
+
+n deed, @Component inherits from @Directive, so that's no surprise that you can use the same hooks for both ;-)
+(except for the hooks that are specific for Component and thus don't exist on its parent class Directive)
+
+Shared hooks between components and directives:
+
+ngOnChanges()
+ngOnInit()
+ngDoCheck()
+ngOnDestroy()
+
+Hooks specific to components:
+ngAfterContentInit()
+ngAfterContentChecked()
+ngAfterViewInit()
+ngAfterViewChecked()

@@ -1,0 +1,113 @@
+What is an Injection Context?
+An injection context is an environment where Angular’s Dependency Injection (DI) system is active.
+In this context, you can use Angular’s inject() function to get instances of services, tokens, or other dependencies
+
+The injection context is active in these situations:
+
+During the creation of a class that Angular manages (e.g., @Injectable, @Component).
+When using factory functions in providers or InjectionToken.
+Inside special Angular APIs, like router guards.
+Inside a manually created injection context using runInInjectionContext().
+----------------------------------------------------------------------------------------------
+Using Injection Contexts in Different Scenarios:
+
+1. Class Constructors
+When Angular creates an instance of a class, it runs the constructor within an injection context.
+You can use the inject() function inside the constructor to retrieve dependencies.
+
+import { inject, Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root',
+})
+class MyService {
+  private service1 = inject(Service1); // Injecting at the field level
+  private service2: Service2;
+
+  constructor() {
+    this.service2 = inject(Service2); // Injecting in the constructor
+  }
+}
+Key Points:
+
+Field initialization (e.g., service1) happens in the injection context.
+Constructor execution also happens in the injection context, so you can inject services there.
+----------------------------------------------------------------------------------------------
+
+ Router Guards Example
+
+ Router guards like CanActivateFn run in an injection context.
+ This allows you to use inject() to access services or tokens without explicitly adding them to a constructor.
+
+import { CanActivateFn, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { inject } from '@angular/core';
+
+const canActivateTeam: CanActivateFn = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
+  const permissionsService = inject(PermissionsService);
+  const userToken = inject(UserToken);
+
+  // Use injected services to decide if navigation is allowed
+  return permissionsService.canActivate(userToken, route.params.id);
+};
+
+Key Points:
+
+No need to define a class or constructor; just use inject() directly.
+Simplifies accessing services inside guard functions.
+----------------------------------------------------------------------------------------------
+
+Using runInInjectionContext
+Sometimes, you need to manually create an injection context because you are working outside of Angular’s managed context.
+
+For example, consider a scenario where a method in a service needs to inject another service dynamically:
+
+import { inject, Injectable, EnvironmentInjector, runInInjectionContext } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root',
+})
+class HeroService {
+  private environmentInjector = inject(EnvironmentInjector);
+
+  someMethod() {
+    runInInjectionContext(this.environmentInjector, () => {
+      const someService = inject(SomeService); // Injected dynamically
+      someService.doSomething();
+    });
+  }
+}
+
+runInInjectionContext Syntax:
+runInInjectionContext(injector, () => {
+  const service = inject(Service);  // Dynamically inject a service
+  service.someMethod();             // Call method on the injected service
+});
+
+injector: Any valid Angular injector (e.g., EnvironmentInjector, Injector, ModuleInjector, ComponentInjector), depending on the context.
+It  provides the injection context. It defines the scope for dependency resolution when you are working outside Angular's typical context (e.g., lifecycle hooks or Angular zones).
+callback: A function where inject() can be used to inject services dynamically.
+
+Key Points:
+runInInjectionContext() takes an injector (like EnvironmentInjector) and a callback function.
+Inside this callback, inject() works as it normally would.
+----------------------------------------------------------------------------------------------
+
+Asserting the Context
+
+You can use assertInInjectionContext() to check if you are currently in an injection context.
+If not, it throws an error. This is useful for debugging or ensuring your code only runs in valid contexts.
+
+import { assertInInjectionContext, inject, Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root',
+})
+class MyService {
+  constructor() {
+    assertInInjectionContext(); // Throws an error if not in an injection context
+    const service = inject(SomeService); // Safe to inject
+  }
+}
+
+
+

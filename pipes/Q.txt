@@ -2,7 +2,8 @@ What are pure Pipes?
 
 Pure Pipes
 Definition:
-Pure pipes are stateless and rely solely on their input values for the output. They do not maintain any internal state and always produce the same output for the same input. Pure pipes are only executed when Angular detects a pure change to the input value. A pure change is either a change to a primitive input value or a change to an object reference.
+Pure pipes are stateless and rely solely on their input values for the output. They do not maintain any internal state and always produce the same output for the same input.
+Pure pipes are only executed when Angular detects a pure change to the input value. A pure change is either a change to a primitive input value or a change to an object reference.
 
 Behavior:
 Angular checks pure pipes only when the input value changes.
@@ -161,6 +162,71 @@ Use the async Pipe in the Template
     </li>
   </ul>
 </div>
+
+Note :
+
+If this.userService.getUser(); returns a typical API response in the form of:
+{
+  "status": true,
+  "data": {
+    "user": {
+      "name": "a"
+    }
+  }
+}
+Then the async pipe alone will not automatically extract the nested data for you. It will simply pass the entire API response object to the template.
+In this case, if you want to access the name property of the user, you need to navigate through the nested structure.
+
+Example with Nested API Response:
+user$: Observable<{ status: boolean, data: { user: { name: string } } }> = this.userService.getUser();
+
+Then in your template, you would use the async pipe to extract the nested data manually:
+
+<div *ngIf="user$ | async as response">
+  <p>User Name: {{ response.data.user.name }}</p>
+</div>
+
+---------------------------------------------------------------------------------------------------------------------------
+
+What kind of data can be used with async pipe?
+
+The async pipe in Angular is used with observables or promises, automatically subscribing to the data and updating the view when new values are emitted.
+Here's a breakdown of the types of data that can be used with the async pipe:
+
+1.Observables:
+
+Most commonly used with Observable<T> from RxJS.
+The async pipe subscribes to the observable and binds the emitted values to the view.
+It automatically handles subscriptions and unsubscriptions, making it easier to manage observable data without manually subscribing or unsubscribing.
+
+Example with Observable:
+
+data$ = this.someService.getData();  // data$ is an Observable
+
+// In template
+<div *ngIf="data$ | async as data">
+  {{ data }}
+</div>
+
+2.Promises:
+
+Can also be used with Promise<T>.
+The async pipe waits for the promise to resolve and binds the resolved value to the view.
+
+Example with Promise:
+
+dataPromise = this.someService.getDataAsPromise();  // dataPromise is a Promise
+
+// In template
+<div *ngIf="dataPromise | async as data">
+  {{ data }}
+</div>
+
+In summary, you can use the async pipe with:
+
+Observable<T>
+Promise<T>
+
 ---------------------------------------------------------------------------------------------------------------------------
 
 

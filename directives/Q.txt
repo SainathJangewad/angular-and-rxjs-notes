@@ -27,6 +27,7 @@ Answer:
 For example:
 @HostBinding('class.active') isActive = true;
 
+
 @HostListener is used to listen to events on the host element and execute a method when the event occurs. For example:
 @HostListener('click') onClick() {
   console.log('Element clicked');
